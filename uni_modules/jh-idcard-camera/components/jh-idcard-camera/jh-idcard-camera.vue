@@ -3,7 +3,7 @@
     <view class="popup-content photographCenter" :style="'height: 100vh;box-sizing: border-box;border-radius:0'">
       <image class="back-icon" src="../../static/camera_back.png" @click="photographRef?.close()"></image>
       <view class="waper flex-align-center">
-        <view class="noticeTXT">请将身份证{{ type === 'front' ? '人像' : '背' }}面放入框内</view>
+        <view class="noticeTXT">请将身份证{{ type === 'front' ? '人像' : '国徽' }}面放入框内</view>
         <camera v-if="flagShowCamera" mode="normal" device-position="back" flash="auto" @error="error" @initdone="initdone" style="width: 632rpx; height: 400rpx">
          <cover-view class="controls">
             <cover-image v-if="type === 'front'" v-show="coverImgFlag" class="img" src="../../static/camera_module_front.png" />
@@ -23,11 +23,25 @@
 </template>
 
 <script setup>
-  import { ref, onMounted, watch, getCurrentInstance, nextTick, reactive, computed, defineExpose, defineEmits } from "vue";
+  import { ref, onMounted, watch, getCurrentInstance, nextTick, reactive, computed, defineExpose, defineEmits, defineProps } from "vue";
   import { onLoad, onShareAppMessage, onShareTimeline, onShow, onPullDownRefresh } from "@dcloudio/uni-app";
   import CustomPopup from "../custom-popup/index.vue";
   
-  const emits = defineEmits(['get-photo']);
+  const props = defineProps({
+    quality: {
+      type: String,
+      default: 'normal' // high (high quality), normal (normal quality), low (low quality)
+    },
+    sizeType: {
+      type: Array,
+      default: ['original', 'compressed']
+    },
+    sourceType: {
+      type: Array,
+      default: ['album']
+    }
+  })
+  const emits = defineEmits(['getData', 'chooseImageFail', 'cameraInitDone', 'cameraInitError', 'takePhotoError']);
   
   const photographRef = ref();
   const coverImgFlag = ref(true);
@@ -36,20 +50,20 @@
   const type = ref('front');
   
   const error = (e) => {
-    console.log(e);
+    emits('cameraInitError', e);
   }
   
   const initdone = (e) => {
-    console.log(e);
+    emits('cameraInitDone', e);
   }
   
   const isBase64Img = (pathUrl) => {
-    wx.getFileSystemManager().readFile({
+    uni.getFileSystemManager().readFile({
       filePath: pathUrl,
-      encoding: 'base64', //编码格式
+      encoding: 'base64',
       success: res => {
         photographRef?.value.close();
-        emits('get-photo', {
+        emits('getData', {
           type: type.value,
           base64: res.data,
           url: pathUrl
@@ -63,31 +77,35 @@
   
   const openAlbum = () => {
     uni.chooseImage({
-      count: 1, // 默认9  
-      sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有  
-      sourceType: ['album'], // 可以指定来源是相册还是相机，默认二者都有  
+      count: 1,
+      sizeType: props.sizeType, 
+      sourceType: ['album'],
       success: res => {
-        console.log(res);
         pic.value = res.tempFilePaths[0]
         uni.showLoading({
           title: '保存中'
         });
         isBase64Img(res.tempFilePaths[0])
+      },
+      fail: err => {
+        emit('chooseImageFail', err);
       }
     })
   }
   
   const distinguish = () => {
-    const ctx = wx.createCameraContext()
+    const ctx = uni.createCameraContext()
     ctx.takePhoto({
-      quality: 'normal',
+      quality: props.quality,
       success: (res) => {
-        //res.tempImagePath为拍取的相片
         pic.value = res.tempImagePath
         uni.showLoading({
           title: '保存中'
         });
         isBase64Img(res.tempImagePath)
+      },
+      fail: err => {
+        emits('takePhotoError', err);
       }
     })
   }
@@ -101,11 +119,13 @@
     photographRef?.value.open();
   }
   
-  defineExpose({
-    open
-  })
+  const close = () => {
+    photographRef?.value.close();
+  }
   
-  onLoad(() => {
+  defineExpose({
+    open,
+    close
   })
   
 </script>
