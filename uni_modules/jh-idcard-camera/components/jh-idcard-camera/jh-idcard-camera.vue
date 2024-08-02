@@ -23,8 +23,7 @@
 </template>
 
 <script setup>
-  import { ref, onMounted, watch, getCurrentInstance, nextTick, reactive, computed, defineExpose, defineEmits, defineProps } from "vue";
-  import { onLoad, onShareAppMessage, onShareTimeline, onShow, onPullDownRefresh } from "@dcloudio/uni-app";
+  import { ref, defineExpose, defineEmits, defineProps } from "vue";
   import CustomPopup from "../custom-popup/index.vue";
   
   const props = defineProps({

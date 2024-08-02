@@ -7,8 +7,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, getCurrentInstance, nextTick, reactive, computed, defineExpose, defineEmits } from "vue";
-import { onLoad, onShareAppMessage, onShareTimeline, onShow, onPullDownRefresh } from "@dcloudio/uni-app";
+import { ref, watch, defineExpose, defineEmits } from "vue";
 
 const emits = defineEmits(['change']);
 const visible = ref(false);
