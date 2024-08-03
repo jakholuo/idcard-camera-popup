@@ -34,10 +34,6 @@
     sizeType: {
       type: Array,
       default: ['original', 'compressed']
-    },
-    sourceType: {
-      type: Array,
-      default: ['album']
     }
   })
   const emits = defineEmits(['getData', 'chooseImageFail', 'cameraInitDone', 'cameraInitError', 'takePhotoError']);
