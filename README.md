@@ -1,3 +1,23 @@
+# Idcard-Camera-Popup 
+
+uniapp 身份证拍照组件，使用了微信小程序 API ，目前仅支持微信小程序。
+
+| 平台 | 支持情况 |
+| --- | --- |
+| 微信小程序 | ✅ |
+
+## Demo
+
+![demo1](./demo1.jpg) ![demo2](./demo2.jpg) ![demo3](./demo.gif)
+
+
+
+## Usage
+
+1. 将 `\uni_modules\` 下的 `jh-idcard-camera` 文件夹放入您 uniapp 项目文件夹下的 `\uni_modules\` 目录内。
+2. 参照本项目 `/pages/index.vue` 文件使用，直接在页面内使用组件 `<jh-idcard-camera ref="cameraPopup" />`。
+
+```
 <template>
 	<view>
     <button @click="openFront">打开身份证正面弹窗</button>
@@ -27,3 +47,4 @@
   }
   
 </script>
+```
